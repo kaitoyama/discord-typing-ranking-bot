@@ -18,19 +18,21 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   try {
     const submissionRepo = AppDataSource.getRepository(Submission);
     
-    // Get top results for each user
     const rankedScores = await submissionRepo
       .createQueryBuilder('submission')
       .select([
         'submission.userId',
-        'MAX(submission.score) as best_score',
-        'MAX(submission.level) as level',
-        'SUM(submission.miss) as total_miss',
-        'AVG(submission.speed) as avg_speed',
-        'AVG(submission.accuracy) as avg_accuracy'
+        'submission.score as best_score',
+        'submission.level as level',
+        'submission.miss as miss_type_count',
+        'submission.speed as speed',
+        'submission.accuracy as accuracy'
       ])
-      .groupBy('submission.userId')
-      .orderBy('best_score', 'DESC')
+      .distinctOn(['submission.userName'])
+      .orderBy({
+        'submission.userId': 'ASC',
+        'submission.score': 'DESC'
+      })
       .limit(showAll ? undefined : 16)
       .getRawMany();
 
@@ -41,24 +43,25 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       });
     }
 
-    // Format results
     const embed = new EmbedBuilder()
       .setColor(0x00FF00)
       .setTitle('タイピングランキング')
       .setDescription(showAll ? '全ユーザーのランキング' : 'トップ16のランキング');
 
-    rankedScores.forEach((score, index) => {
-      embed.addFields({
-        name: `#${index + 1}`,
-        value: `ユーザーID: ${score.userId}\n` +
-               `最高スコア: ${score.best_score}\n` +
-               `レベル: ${score.level}\n` +
-               `平均速度: ${score.avg_speed.toFixed(2)}文字/秒\n` +
-               `平均正確率: ${(score.avg_accuracy * 100).toFixed(2)}%\n` +
-               `総ミスタイプ数: ${score.total_miss}`,
-        inline: true
+    rankedScores
+      .sort((a, b) => b.best_score - a.best_score)
+      .forEach((score, index) => {
+        embed.addFields({
+          name: `#${index + 1}`,
+          value: `ユーザー名: ${score.userId}\n` +
+                 `最高スコア: ${score.best_score}\n` +
+                 `レベル: ${score.level}\n` +
+                 `速度: ${score.speed.toFixed(2)}文字/秒\n` +
+                 `正確率: ${(score.accuracy * 100).toFixed(2)}%\n` +
+                 `ミスタイプ数: ${score.miss_type_count}`,
+          inline: true
+        });
       });
-    });
 
     return interaction.reply({ embeds: [embed] });
 

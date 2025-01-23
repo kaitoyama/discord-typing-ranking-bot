@@ -45,7 +45,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     // トランザクション開始
     await AppDataSource.manager.transaction(async transactionalEntityManager => {
       const submission = transactionalEntityManager.create(Submission, {
-        userId: interaction.user.id,
+        userId: interaction.user.username,
         content: image.url,
         speed: speed,
         accuracy: accuracy,
