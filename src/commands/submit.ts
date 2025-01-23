@@ -1,6 +1,8 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, AttachmentBuilder, EmbedBuilder } from 'discord.js';
 import { createThread } from '../utils/thread';
 import { analyze } from '../utils/analyze';
+import { Submission } from '../entities/Submission';
+import { AppDataSource } from '../config/typeorm.config';
 
 export const data = new SlashCommandBuilder()
   .setName('submit')
@@ -33,6 +35,26 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       throw new Error('画像の分析に失敗しました。必要な情報が取得できませんでした。');
     }
 
+    // タイピング速度と正確率を計算
+    const speed = result.charCount; // 1分間あたりの文字数
+    const accuracy = result.accuracyRate / 100; // 0-1の範囲に正規化
+    
+    // スコア計算 (速度 * 正確率)
+    const score = Math.round(speed * accuracy);
+
+    // トランザクション開始
+    await AppDataSource.manager.transaction(async transactionalEntityManager => {
+      const submission = transactionalEntityManager.create(Submission, {
+        userId: interaction.user.id,
+        content: image.url,
+        speed: speed,
+        accuracy: accuracy,
+        miss: result.mistypeCount,
+        score: score
+      });
+      await transactionalEntityManager.save(submission);
+    });
+
     // 成功時のEmbedメッセージを作成
     const successEmbed = new EmbedBuilder()
       .setColor(result.level>= 5 ? 0x00FF00 : 0xFFA500)  // レベル5未満は橙色
@@ -59,8 +81,9 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     // エラー時のEmbedメッセージを作成
     const errorEmbed = new EmbedBuilder()
       .setColor(0xFF0000)
-      .setTitle('エラー')
-      .setDescription(error instanceof Error ? error.message : '画像の分析中にエラーが発生しました。');
+      .setTitle('エラーが発生しました')
+      .setDescription(error instanceof Error ? error.message : '不明なエラーが発生しました')
+      .setTimestamp();
 
     // スレッドにエラーメッセージを送信
     await thread.send({ embeds: [errorEmbed] });
