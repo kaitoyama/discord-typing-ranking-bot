@@ -154,10 +154,22 @@ function extractDataByLocation(json: ReadResult): ResultData {
   };
   const mistypeCountRegion: Region = {
     boundingPolygon: [
-      { x: 294, y: 352 },
-      { x: 428, y: 350 },
-      { x: 429, y: 380 },
-      { x: 295, y: 381 },
+      {
+        x: 133,
+        y: 354,
+      },
+      {
+        x: 280,
+        y: 354,
+      },
+      {
+        x: 280,
+        y: 379,
+      },
+      {
+        x: 133,
+        y: 379,
+      },
     ],
   }; // "… 12回" の領域
 
