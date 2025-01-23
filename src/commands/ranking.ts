@@ -27,7 +27,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         'submission.speed as speed',
         'submission.accuracy as accuracy'
       ])
-      .distinctOn(['submission.userName'])
+      .distinctOn(['submission.userId'])
       .orderBy({
         'submission.userId': 'ASC',
         'submission.score': 'DESC'
