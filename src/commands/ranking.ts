@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
-import { getRepository } from 'typeorm';
+import { AppDataSource } from '../config/typeorm.config';
 import { Submission } from '../entities/Submission';
 
 export const data = new SlashCommandBuilder()
@@ -16,7 +16,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   const showAll = interaction.options.getBoolean('all') ?? false;
 
   try {
-    const submissionRepo = getRepository(Submission);
+    const submissionRepo = AppDataSource.getRepository(Submission);
     
     // Get top results for each user
     const rankedScores = await submissionRepo
