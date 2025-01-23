@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm';
 import 'reflect-metadata';
 import * as dotenv from 'dotenv';
+import { Submission } from '../entities/Submission';
 
 dotenv.config();
 
@@ -13,7 +14,7 @@ export const AppDataSource = new DataSource({
   database: process.env.NS_MARIADB_DATABASE || 'discord',
   synchronize: false,
   logging: false,
-  entities: ["dist/**/*.entity.js"],
+  entities: [Submission],
   migrations: ['src/migrations/*.ts'],
   subscribers: [],
 });
