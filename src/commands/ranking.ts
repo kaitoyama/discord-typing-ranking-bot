@@ -47,6 +47,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       .setTitle('タイピングランキング')
       .setDescription(showAll ? '全ユーザーのランキング' : 'トップ16のランキング');
 
+    console.log(rankedScores);
+
     rankedScores
       .sort((a, b) => b.best_score - a.best_score)
       .forEach((score, index) => {
