@@ -23,7 +23,6 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       .select([
         'submission.userId',
         'submission.score as best_score',
-        'submission.level as level',
         'submission.miss as miss_type_count',
         'submission.speed as speed',
         'submission.accuracy as accuracy'
@@ -55,7 +54,6 @@ export async function execute(interaction: ChatInputCommandInteraction) {
           name: `#${index + 1}`,
           value: `ユーザー名: ${score.userId}\n` +
                  `最高スコア: ${score.best_score}\n` +
-                 `レベル: ${score.level}\n` +
                  `速度: ${score.speed.toFixed(2)}文字/秒\n` +
                  `正確率: ${(score.accuracy * 100).toFixed(2)}%\n` +
                  `ミスタイプ数: ${score.miss_type_count}`,
