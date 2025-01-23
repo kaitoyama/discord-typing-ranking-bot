@@ -13,7 +13,7 @@ export const AppDataSource = new DataSource({
   database: process.env.NS_MARIADB_DATABASE || 'discord',
   synchronize: false,
   logging: false,
-  entities: ['src/entities/*.ts'],
+  entities: ["dist/**/*.entity.js"],
   migrations: ['src/migrations/*.ts'],
   subscribers: [],
 });
