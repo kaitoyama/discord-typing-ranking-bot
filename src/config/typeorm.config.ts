@@ -10,7 +10,7 @@ export const AppDataSource = new DataSource({
   port: parseInt(process.env.NS_MARIADB_PORT || '3006'),
   username: process.env.NS_MARIADB_USER || 'root',
   password: process.env.NS_MARIADB_PASSWORD || 'password',
-  database: process.env.NS_MARIADB_NAME || 'discord',
+  database: process.env.NS_MARIADB_DATABASE || 'discord',
   synchronize: false,
   logging: false,
   entities: ['src/entities/*.ts'],
