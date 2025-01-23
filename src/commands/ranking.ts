@@ -54,7 +54,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       .forEach((score, index) => {
         embed.addFields({
           name: `#${index + 1}`,
-          value: `ユーザー名: ${score.userId}\n` +
+          value: `ユーザー名: ${score.submission_userId}\n` +
                  `最高スコア: ${score.best_score}\n` +
                  `速度: ${score.speed.toFixed(2)}文字/秒\n` +
                  `正確率: ${(score.accuracy * 100).toFixed(2)}%\n` +
