@@ -47,21 +47,19 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       .setTitle('タイピングランキング')
       .setDescription(showAll ? '全ユーザーのランキング' : 'トップ16のランキング');
 
-    console.log(rankedScores);
 
-    rankedScores
-      .sort((a, b) => b.best_score - a.best_score)
-      .forEach((score, index) => {
-        embed.addFields({
-          name: `#${index + 1}`,
-          value: `ユーザー名: ${score.submission_userId}\n` +
-                 `最高スコア: ${score.best_score}\n` +
-                 `速度: ${score.speed.toFixed(2)}文字/秒\n` +
-                 `正確率: ${(score.accuracy * 100).toFixed(2)}%\n` +
-                 `ミスタイプ数: ${score.miss_type_count}`,
-          inline: true
-        });
-      });
+    const users = rankedScores.map(score => score.submission_userId);
+    const scores = rankedScores.map(score => score.best_score);
+    const speeds = rankedScores.map(score => `${score.speed.toFixed(2)}文字/分`);
+    const accuracies = rankedScores.map(score => `${(score.accuracy * 100).toFixed(2)}%`);
+    const missTypes = rankedScores.map(score => score.miss_type_count);
+
+    embed.addFields({name: 'ユーザー', value: users.join('\n'), inline: true});
+    embed.addFields({name: 'スコア', value: scores.join('\n'), inline: true});
+    embed.addFields({name: '速度', value: speeds.join('\n'), inline: true});
+    embed.addFields({name: '正確率', value: accuracies.join('\n'), inline: true});
+    embed.addFields({name: 'ミスタイプ数', value: missTypes.join('\n'), inline: true});
+
 
     return interaction.reply({ embeds: [embed] });
 
