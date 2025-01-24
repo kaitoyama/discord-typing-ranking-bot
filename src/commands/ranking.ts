@@ -40,6 +40,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       .limit(showAll ? undefined : 16)
       .getRawMany();
 
+    console.log(rankedScores);
+
     if (rankedScores.length === 0) {
       return interaction.reply({
         content: 'まだランキングデータがありません',
@@ -58,11 +60,11 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       .forEach((score, index) => {
         embed.addFields({
           name: `#${index + 1}`,
-          value: `ユーザー名: ${score.submission_userId}\n` +
+          value: `ユーザー名: ${score.user_name}\n` +
                  `最高スコア: ${score.best_score}\n` +
                  `速度: ${score.speed.toFixed(2)}文字/秒\n` +
                  `正確率: ${(score.accuracy * 100).toFixed(2)}%\n` +
-                 `ミスタイプ数: ${score.miss_type_count}`,
+                 `ミスタイプ数: ${score.miss}`,
           inline: true
         });
       });
