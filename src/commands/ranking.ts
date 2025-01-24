@@ -19,28 +19,28 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     const submissionRepo = AppDataSource.getRepository(Submission);
     
     const rankedScores = await submissionRepo
-    .createQueryBuilder()
-    .select('RankedScores.userId', 'user_name')
-    .addSelect('RankedScores.miss', 'miss')
-    .addSelect('RankedScores.speed', 'speed')
-    .addSelect('RankedScores.accuracy', 'accuracy')
-    .addSelect('RankedScores.score', 'best_score')
-    .addSelect('RankedScores.createdAt', 'created_at') // 追加
-    .from(subQuery => {
-      return subQuery
-        .select('submission.userId', 'userId')
-        .addSelect('submission.miss', 'miss')
-        .addSelect('submission.speed', 'speed')
-        .addSelect('submission.accuracy', 'accuracy')
-        .addSelect('submission.score', 'score')
-        .addSelect('submission.createdAt', 'createdAt') // 追加
-        .addSelect('ROW_NUMBER() OVER (PARTITION BY submission.userId ORDER BY submission.score DESC, submission.createdAt DESC)', 'rank') // createdAtでソートを追加
-        .from('submission', 'submission');
-    }, 'RankedScores')
-    .where('RankedScores.rank = 1')
-    .orderBy('best_score', 'DESC')
-    .limit(showAll ? undefined : 16)
-    .getRawMany();
+    .query(`SELECT
+    RankedScores.userId AS user_name,
+    RankedScores.miss AS miss,
+    RankedScores.speed AS speed,
+    RankedScores.accuracy AS accuracy,
+    RankedScores.score AS best_score
+    FROM
+        (
+            SELECT
+                submission.userId,
+                submission.miss,
+                submission.speed,
+                submission.accuracy,
+                submission.score,
+                ROW_NUMBER() OVER (PARTITION BY submission.userId ORDER BY submission.score DESC) AS rank
+            FROM
+                submission
+        ) AS RankedScores
+    WHERE
+        RankedScores.rank = 1
+    ORDER BY
+        best_score DESC` + (showAll ? '' : ' LIMIT 16'));
 
     console.log(rankedScores);
 
@@ -58,8 +58,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
 
     rankedScores
-      .sort((a, b) => b.best_score - a.best_score)
-      .forEach((score, index) => {
+      .sort((a: { best_score: number; }, b: { best_score: number; }) => b.best_score - a.best_score)
+      .forEach((score: { user_name: any; best_score: any; speed: number; accuracy: number; miss: any; }, index: number) => {
         embed.addFields({
           name: `#${index + 1}`,
           value: `ユーザー名: ${score.user_name}\n` +
