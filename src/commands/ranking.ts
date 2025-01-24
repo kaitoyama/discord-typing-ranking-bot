@@ -32,7 +32,10 @@ export async function execute(interaction: ChatInputCommandInteraction) {
           .addSelect('submission.speed', 'speed')
           .addSelect('submission.accuracy', 'accuracy')
           .addSelect('submission.score', 'score')
-          .addSelect('ROW_NUMBER() OVER (PARTITION BY submission.userId ORDER BY submission.score DESC)', 'rank')
+          .addSelect(
+            'ROW_NUMBER() OVER (PARTITION BY submission.userId ORDER BY submission.score DESC, submission.createdAt DESC)',
+            'rank'
+          )
           .from('submission', 'submission');
       }, 'RankedScores')
       .where('RankedScores.rank = 1')
