@@ -19,19 +19,24 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     const submissionRepo = AppDataSource.getRepository(Submission);
     
     const rankedScores = await submissionRepo
-      .createQueryBuilder('submission')
-      .select([
-        'submission.userId',
-        'submission.score as best_score',
-        'submission.miss as miss_type_count',
-        'submission.speed as speed',
-        'submission.accuracy as accuracy'
-      ])
-      .distinctOn(['submission.userId'])
-      .orderBy({
-        'submission.userId': 'ASC',
-        'submission.score': 'DESC'
-      })
+      .createQueryBuilder()
+      .select('RankedScores.userId', 'user_name')
+      .addSelect('RankedScores.miss', 'miss')
+      .addSelect('RankedScores.speed', 'speed')
+      .addSelect('RankedScores.accuracy', 'accuracy')
+      .addSelect('RankedScores.score', 'best_score')
+      .from(subQuery => {
+        return subQuery
+          .select('submission.userId', 'userId')
+          .addSelect('submission.miss', 'miss')
+          .addSelect('submission.speed', 'speed')
+          .addSelect('submission.accuracy', 'accuracy')
+          .addSelect('submission.score', 'score')
+          .addSelect('ROW_NUMBER() OVER (PARTITION BY submission.userId ORDER BY submission.score DESC)', 'rank')
+          .from('submission', 'submission');
+      }, 'RankedScores')
+      .where('RankedScores.rank = 1')
+      .orderBy('best_score', 'DESC')
       .limit(showAll ? undefined : 16)
       .getRawMany();
 
