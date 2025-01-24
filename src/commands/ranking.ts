@@ -19,29 +19,26 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     const submissionRepo = AppDataSource.getRepository(Submission);
     
     const rankedScores = await submissionRepo
-      .createQueryBuilder()
-      .select('RankedScores.userId', 'user_name')
-      .addSelect('RankedScores.miss', 'miss')
-      .addSelect('RankedScores.speed', 'speed')
-      .addSelect('RankedScores.accuracy', 'accuracy')
-      .addSelect('RankedScores.score', 'best_score')
-      .from(subQuery => {
-        return subQuery
-          .select('submission.userId', 'userId')
-          .addSelect('submission.miss', 'miss')
-          .addSelect('submission.speed', 'speed')
-          .addSelect('submission.accuracy', 'accuracy')
-          .addSelect('submission.score', 'score')
-          .addSelect(
-            'ROW_NUMBER() OVER (PARTITION BY submission.userId ORDER BY submission.score DESC, submission.createdAt DESC)',
-            'rank'
-          )
-          .from('submission', 'submission');
-      }, 'RankedScores')
-      .where('RankedScores.rank = 1')
-      .orderBy('best_score', 'DESC')
-      .limit(showAll ? undefined : 16)
-      .getRawMany();
+    .createQueryBuilder()
+    .select('RankedScores.userId', 'user_name')
+    .addSelect('RankedScores.miss', 'miss')
+    .addSelect('RankedScores.speed', 'speed')
+    .addSelect('RankedScores.accuracy', 'accuracy')
+    .addSelect('RankedScores.score', 'best_score')
+    .from(subQuery => {
+      return subQuery
+        .select('submission.userId', 'userId')
+        .addSelect('submission.miss', 'miss')
+        .addSelect('submission.speed', 'speed')
+        .addSelect('submission.accuracy', 'accuracy')
+        .addSelect('submission.score', 'score')
+        .addSelect('RANK() OVER (PARTITION BY submission.userId ORDER BY submission.score DESC)', 'rank') // Use RANK() here
+        .from('submission', 'submission');
+    }, 'RankedScores')
+    .where('RankedScores.rank = 1')
+    .orderBy('best_score', 'DESC')
+    .limit(showAll ? undefined : 16)
+    .getRawMany();
 
     console.log(rankedScores);
 
