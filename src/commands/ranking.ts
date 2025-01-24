@@ -25,6 +25,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     .addSelect('RankedScores.speed', 'speed')
     .addSelect('RankedScores.accuracy', 'accuracy')
     .addSelect('RankedScores.score', 'best_score')
+    .addSelect('RankedScores.createdAt', 'created_at') // 追加
     .from(subQuery => {
       return subQuery
         .select('submission.userId', 'userId')
@@ -32,7 +33,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         .addSelect('submission.speed', 'speed')
         .addSelect('submission.accuracy', 'accuracy')
         .addSelect('submission.score', 'score')
-        .addSelect('RANK() OVER (PARTITION BY submission.userId ORDER BY submission.score DESC)', 'rank') // Use RANK() here
+        .addSelect('submission.createdAt', 'createdAt') // 追加
+        .addSelect('ROW_NUMBER() OVER (PARTITION BY submission.userId ORDER BY submission.score DESC, submission.createdAt DESC)', 'rank') // createdAtでソートを追加
         .from('submission', 'submission');
     }, 'RankedScores')
     .where('RankedScores.rank = 1')
