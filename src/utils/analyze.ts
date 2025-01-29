@@ -100,6 +100,8 @@ function extractTextFromRegion(lines: Line[], region: Region): Line[] {
  * @returns 抽出された情報 (レベル、文字数、正確率、ミスタイプ数)
  */
 function extractDataByLocation(json: ReadResult): ResultData {
+  // debug out the json
+  console.debug(json);
   const result: ResultData = {};
   const lines = json.lines;
 
