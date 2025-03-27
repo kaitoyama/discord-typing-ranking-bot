@@ -70,7 +70,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
 
     // 成功時のEmbedメッセージを作成
     const successEmbed = new EmbedBuilder()
-      .setColor(result.level!= 5 ? 0x00FF00 : 0xFFA500)  // レベル5未満は橙色
+      .setColor(result.level=== 5 ? 0x00FF00 : 0xFFA500)  // レベル5未満は橙色
       .setTitle('分析結果')
       .addFields(
         { name: 'レベル', value: `${result.level}`, inline: true },
