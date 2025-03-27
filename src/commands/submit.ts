@@ -52,7 +52,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       console.log('ユーザー名:', interaction.user.username);
       console.log('画像URL:', image.url);
     } else{
-
+      if (result.level === 5) {
       // トランザクション開始
       await AppDataSource.manager.transaction(async transactionalEntityManager => {
         const submission = transactionalEntityManager.create(Submission, {
@@ -66,10 +66,11 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         await transactionalEntityManager.save(submission);
       });
     }
+    }
 
     // 成功時のEmbedメッセージを作成
     const successEmbed = new EmbedBuilder()
-      .setColor(result.level>= 5 ? 0x00FF00 : 0xFFA500)  // レベル5未満は橙色
+      .setColor(result.level!= 5 ? 0x00FF00 : 0xFFA500)  // レベル5未満は橙色
       .setTitle('分析結果')
       .addFields(
         { name: 'レベル', value: `${result.level}`, inline: true },
