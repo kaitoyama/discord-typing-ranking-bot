@@ -42,18 +42,30 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     // スコア計算 (速度 * 正確率)
     const score = Math.round(speed * accuracy);
 
-    // トランザクション開始
-    await AppDataSource.manager.transaction(async transactionalEntityManager => {
-      const submission = transactionalEntityManager.create(Submission, {
-        userId: interaction.user.username,
-        content: image.url,
-        speed: speed,
-        accuracy: accuracy,
-        miss: result.mistypeCount,
-        score: score
+    if (interaction.user.username==='kaitoyama') {
+      console.log('スコア:', score);
+      console.log('レベル:', result.level);
+      console.log('文字数:', result.charCount);
+      console.log('正確率:', result.accuracyRate);
+      console.log('ミスタイプ数:', result.mistypeCount);
+      console.log('スレッドID:', thread.id);
+      console.log('ユーザー名:', interaction.user.username);
+      console.log('画像URL:', image.url);
+    } else{
+
+      // トランザクション開始
+      await AppDataSource.manager.transaction(async transactionalEntityManager => {
+        const submission = transactionalEntityManager.create(Submission, {
+          userId: interaction.user.username,
+          content: image.url,
+          speed: speed,
+          accuracy: accuracy,
+          miss: result.mistypeCount,
+          score: score
+        });
+        await transactionalEntityManager.save(submission);
       });
-      await transactionalEntityManager.save(submission);
-    });
+    }
 
     // 成功時のEmbedメッセージを作成
     const successEmbed = new EmbedBuilder()
