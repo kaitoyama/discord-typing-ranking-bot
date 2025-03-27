@@ -66,10 +66,10 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         { name: 'ミスタイプ数', value: `${result.mistypeCount}回`, inline: true }
       );
 
-    if (result.level < 5) {
+    if (result.level != 5) {
       successEmbed.addFields({
         name: '⚠️ 警告',
-        value: 'レベル5以上でないとランキングに参加できません！',
+        value: 'レベル5でないとランキングに参加できません！',
         inline: false
       });
     }
