@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, AttachmentBuilder, EmbedBuilder } from 'discord.js';
 import { createThread } from '../utils/thread';
 import { analyze } from '../utils/analyze';
+import { calculateScore } from '../utils/score';
 import { Submission } from '../entities/Submission';
 import { AppDataSource } from '../config/typeorm.config';
 
@@ -39,8 +40,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     const speed = result.charCount; // 1分間あたりの文字数
     const accuracy = result.accuracyRate / 100; // 0-1の範囲に正規化
     
-    // スコア計算 (速度 * 正確率)
-    const score = Math.round(speed * accuracy);
+    // スコア計算
+    const score = calculateScore(speed, accuracy);
 
     if (interaction.user.username==='kaitoyama') {
       console.log('スコア:', score);

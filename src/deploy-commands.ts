@@ -26,3 +26,5 @@ export async function deployCommands() {
     console.error(error);
   }
 }
+
+deployCommands();

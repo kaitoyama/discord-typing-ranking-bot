@@ -64,7 +64,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
           name: `#${index + 1}`,
           value: `ユーザー名: ${score.user_name}\n` +
                  `最高スコア: ${score.best_score}\n` +
-                 `速度: ${score.speed.toFixed(2)}文字/秒\n` +
+                 `速度: ${score.speed.toFixed(2)}文字/分\n` +
                  `正確率: ${(score.accuracy * 100).toFixed(2)}%\n` +
                  `ミスタイプ数: ${score.miss}`,
           inline: true
