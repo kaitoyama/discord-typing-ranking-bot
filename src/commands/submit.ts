@@ -41,7 +41,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     const accuracy = result.accuracyRate / 100; // 0-1の範囲に正規化
     
     // スコア計算
-    const score = calculateScore(speed, accuracy);
+    const score = calculateScore(speed, accuracy, result.mistypeCount);
 
     if (interaction.user.username==='kaitoyama') {
       console.log('スコア:', score);

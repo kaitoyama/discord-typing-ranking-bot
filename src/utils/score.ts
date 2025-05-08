@@ -5,8 +5,8 @@
  * @param mistypeCount ミスタイプ数 (オプション)
  * @returns 計算されたスコア
  */
-export function calculateScore(speed: number, accuracy: number, mistypeCount?: number): number {
+export function calculateScore(speed: number, accuracy: number, mistypeCount: number): number {
   // 現在の計算式: 速度 * 正確率
   // 後で更新される可能性があるため、柔軟な設計にします
-  return Math.round(speed * accuracy);
+  return Math.round(speed + (212 - mistypeCount**2 * 2.25)+500);
 }
