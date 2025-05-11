@@ -32,7 +32,10 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     const result = await analyze(image.url);
 
     // 必須項目のチェック
-    if (!result.level || !result.charCount || !result.accuracyRate || !result.mistypeCount) {
+    if (  result.level == null ||
+      result.charCount == null ||
+      result.accuracyRate == null ||
+      result.mistypeCount == null) {
       throw new Error('画像の分析に失敗しました。必要な情報が取得できませんでした。');
     }
 
