@@ -86,6 +86,9 @@ export async function analyze(imageUrl: string): Promise<ResultData> {
     if (!responseText) {
       throw new Error("No response text received from Gemini API");
     }
+
+    // logging the response for debugging
+    console.log("Gemini API response:", responseText);
     
     try {
       // 直接JSONとしてパース
