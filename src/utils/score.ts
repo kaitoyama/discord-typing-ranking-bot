@@ -3,10 +3,11 @@
  * @param speed タイピング速度 (文字数/分)
  * @param accuracy 正確率 (0-1の範囲)
  * @param mistypeCount ミスタイプ数 (オプション)
+ * @param continuousMistypeCount 連続ミスタイプ数 (オプション)
  * @returns 計算されたスコア
  */
-export function calculateScore(speed: number, accuracy: number, mistypeCount: number): number {
+export function calculateScore(speed: number, accuracy: number, mistypeCount: number, continuousMistypeCount: number): number {
   // 現在の計算式: 速度 * 正確率
   // 後で更新される可能性があるため、柔軟な設計にします
-  return Math.round(speed + (212 - mistypeCount**2 * 2.25)+500);
+  return Math.round(speed * (accuracy+1)- ((mistypeCount - continuousMistypeCount) ** 2)*1.5);
 }

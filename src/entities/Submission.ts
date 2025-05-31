@@ -20,6 +20,12 @@ export class Submission {
   @Column('float')
   miss!: number;
 
+  @Column('float')
+  continuousMiss!: number;
+
+  @Column()
+  channelId!: string;
+
   @CreateDateColumn()
   createdAt!: Date;
 }

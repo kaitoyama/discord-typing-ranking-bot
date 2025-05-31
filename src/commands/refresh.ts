@@ -27,7 +27,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     await AppDataSource.manager.transaction(async transactionalEntityManager => {
       for (const submission of submissions) {
         // 新しい計算式でスコアを再計算
-        const newScore = calculateScore(submission.speed, submission.accuracy, submission.miss);
+        const newScore = calculateScore(submission.speed, submission.accuracy, submission.miss, submission.continuousMiss);
         
         // スコアが変わった場合のみ更新
         if (newScore !== submission.score) {

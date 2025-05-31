@@ -22,6 +22,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     .query(`SELECT
     RankedScores.userId AS user_name,
     RankedScores.miss AS miss,
+    RankedScores.continuousMiss AS continuous_miss,
     RankedScores.speed AS speed,
     RankedScores.accuracy AS accuracy,
     RankedScores.score AS best_score
@@ -30,17 +31,20 @@ export async function execute(interaction: ChatInputCommandInteraction) {
             SELECT
                 submission.userId,
                 submission.miss,
+                submission.continuousMiss,
                 submission.speed,
                 submission.accuracy,
                 submission.score,
                 ROW_NUMBER() OVER (PARTITION BY submission.userId ORDER BY submission.score DESC) AS rank
             FROM
                 submission
+            WHERE
+                submission.channelId = ?
         ) AS RankedScores
     WHERE
         RankedScores.rank = 1
     ORDER BY
-        best_score DESC` + (showAll ? '' : ' LIMIT 16'));
+        best_score DESC` + (showAll ? '' : ' LIMIT 16'), [interaction.channelId]);
 
     console.log(rankedScores);
 
@@ -54,19 +58,20 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     const embed = new EmbedBuilder()
       .setColor(0x00FF00)
       .setTitle('タイピングランキング')
-      .setDescription(showAll ? '全ユーザーのランキング' : 'トップ16のランキング');
+      .setDescription((showAll ? '全ユーザーのランキング' : 'トップ16のランキング') + ' (このチャンネル)');
 
 
     rankedScores
       .sort((a: { best_score: number; }, b: { best_score: number; }) => b.best_score - a.best_score)
-      .forEach((score: { user_name: any; best_score: any; speed: number; accuracy: number; miss: any; }, index: number) => {
+      .forEach((score: { user_name: any; best_score: any; speed: number; accuracy: number; miss: any; continuous_miss: any; }, index: number) => {
         embed.addFields({
           name: `#${index + 1}`,
           value: `ユーザー名: ${score.user_name}\n` +
                  `最高スコア: ${score.best_score}\n` +
                  `速度: ${score.speed.toFixed(2)}文字/分\n` +
                  `正確率: ${(score.accuracy * 100).toFixed(2)}%\n` +
-                 `ミスタイプ数: ${score.miss}`,
+                 `ミスタイプ数: ${score.miss}\n` +
+                 `連続ミス: ${score.continuous_miss}`,
           inline: true
         });
       });

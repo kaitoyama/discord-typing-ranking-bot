@@ -35,7 +35,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     if (  result.level == null ||
       result.charCount == null ||
       result.accuracyRate == null ||
-      result.mistypeCount == null) {
+      result.mistypeCount == null ||
+      result.continuousMistypeCount == null) {
       throw new Error('画像の分析に失敗しました。必要な情報が取得できませんでした。');
     }
 
@@ -44,7 +45,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     const accuracy = result.accuracyRate / 100; // 0-1の範囲に正規化
     
     // スコア計算
-    const score = calculateScore(speed, accuracy, result.mistypeCount);
+    const score = calculateScore(speed, accuracy, result.mistypeCount, result.continuousMistypeCount);
 
     if (interaction.user.username==='kaitoyama') {
       console.log('スコア:', score);
@@ -52,6 +53,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       console.log('文字数:', result.charCount);
       console.log('正確率:', result.accuracyRate);
       console.log('ミスタイプ数:', result.mistypeCount);
+      console.log('連続ミスタイプ数:', result.continuousMistypeCount);
       console.log('スレッドID:', thread.id);
       console.log('ユーザー名:', interaction.user.username);
       console.log('画像URL:', image.url);
@@ -61,11 +63,12 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       await AppDataSource.manager.transaction(async transactionalEntityManager => {
         const submission = transactionalEntityManager.create(Submission, {
           userId: interaction.user.username,
-          content: image.url,
           speed: speed,
           accuracy: accuracy,
           miss: result.mistypeCount,
-          score: score
+          continuousMiss: result.continuousMistypeCount,
+          score: score,
+          channelId: interaction.channelId
         });
         await transactionalEntityManager.save(submission);
       });
@@ -80,7 +83,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         { name: 'レベル', value: `${result.level}`, inline: true },
         { name: '文字数', value: `${result.charCount}文字`, inline: true },
         { name: '正確率', value: `${result.accuracyRate}%`, inline: true },
-        { name: 'ミスタイプ数', value: `${result.mistypeCount}回`, inline: true }
+        { name: 'ミスタイプ数', value: `${result.mistypeCount}回`, inline: true },
+        { name: '連続ミスタイプ数', value: `${result.continuousMistypeCount}回`, inline: true }
       );
 
     if (result.level != 5) {

@@ -8,6 +8,7 @@ interface ResultData {
   charCount?: number;
   accuracyRate?: number;
   mistypeCount?: number;
+  continuousMistypeCount?: number;
 }
 
 export async function analyze(imageUrl: string): Promise<ResultData> {
@@ -27,13 +28,15 @@ export async function analyze(imageUrl: string): Promise<ResultData> {
       - charCount: 文字数 (数値)
       - accuracyRate: 正確率 (%を除いた数値、例: 98.5)
       - mistypeCount: ミスタイプ数 (数値)
+      - continuousMistypeCount: 連続ミスタイプ数 (数値)
 
       レスポンスは以下のJSON形式に厳密に従ってください:
       {
         "level": number,
         "charCount": number,
         "accuracyRate": number,
-        "mistypeCount": number
+        "mistypeCount": number,
+        "continuousMistypeCount": number
       }
     `;
 
@@ -74,9 +77,13 @@ export async function analyze(imageUrl: string): Promise<ResultData> {
             mistypeCount: {
               type: Type.NUMBER,
               description: 'ミスタイプの回数'
+            },
+            continuousMistypeCount: {
+              type: Type.NUMBER,
+              description: '連続ミスタイプの回数'
             }
           },
-          required: ['level', 'charCount', 'accuracyRate', 'mistypeCount']
+          required: ['level', 'charCount', 'accuracyRate', 'mistypeCount', 'continuousMistypeCount']
         }
       }
     });
