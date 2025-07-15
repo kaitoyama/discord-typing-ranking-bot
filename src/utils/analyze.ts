@@ -42,7 +42,7 @@ export async function analyze(imageUrl: string): Promise<ResultData> {
 
     // 4. 画像とプロンプトを送信
     const result = await genAI.models.generateContent({
-      model: 'gemini-2.5-flash-preview-04-17',
+      model: 'gemini-2.5-flash',
       contents: [
         {
           role: "user",
