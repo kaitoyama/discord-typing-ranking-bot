@@ -6,7 +6,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 interface ResultData {
   level?: number;
   charCount?: number;
-  accuracyRate?: number;
+  kpm?: number;
   mistypeCount?: number;
   continuousMistypeCount?: number;
 }
@@ -26,7 +26,7 @@ export async function analyze(imageUrl: string): Promise<ResultData> {
       この画像はタイピングゲームの結果画面です。以下の情報を抽出し、厳密に指定されたJSON形式で返してください:
       - level: レベル (数値)
       - charCount: 文字数 (数値)
-      - accuracyRate: 正確率 (%を除いた数値、例: 98.5)
+      - kpm: KPM (1分あたりのキー入力数、数値)
       - mistypeCount: ミスタイプ数 (数値)
       - continuousMistypeCount: 連続ミスタイプ数 (数値)
 
@@ -34,7 +34,7 @@ export async function analyze(imageUrl: string): Promise<ResultData> {
       {
         "level": number,
         "charCount": number,
-        "accuracyRate": number,
+        "kpm": number,
         "mistypeCount": number,
         "continuousMistypeCount": number
       }
@@ -42,7 +42,7 @@ export async function analyze(imageUrl: string): Promise<ResultData> {
 
     // 4. 画像とプロンプトを送信
     const result = await genAI.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3.1-flash-lite',
       contents: [
         {
           role: "user",
@@ -70,9 +70,9 @@ export async function analyze(imageUrl: string): Promise<ResultData> {
               type: Type.NUMBER,
               description: '入力された文字数'
             },
-            accuracyRate: {
+            kpm: {
               type: Type.NUMBER,
-              description: '正確率 (パーセント)'
+              description: 'KPM (1分あたりのキー入力数)'
             },
             mistypeCount: {
               type: Type.NUMBER,
@@ -83,7 +83,7 @@ export async function analyze(imageUrl: string): Promise<ResultData> {
               description: '連続ミスタイプの回数'
             }
           },
-          required: ['level', 'charCount', 'accuracyRate', 'mistypeCount', 'continuousMistypeCount']
+          required: ['level', 'charCount', 'kpm', 'mistypeCount', 'continuousMistypeCount']
         }
       }
     });

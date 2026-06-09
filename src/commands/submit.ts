@@ -1,7 +1,7 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, AttachmentBuilder, EmbedBuilder } from 'discord.js';
 import { createThread } from '../utils/thread';
 import { analyze } from '../utils/analyze';
-import { calculateScore } from '../utils/score';
+import { calculateScore, calculateAccuracy } from '../utils/score';
 import { Submission } from '../entities/Submission';
 import { AppDataSource } from '../config/typeorm.config';
 
@@ -141,27 +141,27 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   //   // 必須項目のチェック
   //   if (  result.level == null ||
   //     result.charCount == null ||
-  //     result.accuracyRate == null ||
+  //     result.kpm == null ||
   //     result.mistypeCount == null ||
   //     result.continuousMistypeCount == null) {
   //     throw new Error('画像の分析に失敗しました。必要な情報が取得できませんでした。');
   //   }
 
-  //   // タイピング速度と正確率を計算
-  //   const speed = result.charCount; // 1分間あたりの文字数
-  //   const accuracy = result.accuracyRate / 100; // 0-1の範囲に正規化
+  //   // スコア用正確率 (0-1) を計算
+  //   const accuracy = calculateAccuracy(result.kpm, result.mistypeCount, result.continuousMistypeCount);
     
   //   // スコア計算
-  //   const score = calculateScore(speed, accuracy, result.mistypeCount, result.continuousMistypeCount);
+  //   const score = calculateScore(result.charCount, result.kpm, result.mistypeCount, result.continuousMistypeCount);
 
-  //   // コメント取得
-  //   const comment = getRandomComment(speed, result.accuracyRate);
+  //   // コメント取得 (KPMとスコア用正確率%を使用)
+  //   const comment = getRandomComment(result.kpm, accuracy * 100);
 
   //   if (interaction.user.username==='kaitoyama') {
   //     console.log('スコア:', score);
   //     console.log('レベル:', result.level);
   //     console.log('文字数:', result.charCount);
-  //     console.log('正確率:', result.accuracyRate);
+  //     console.log('KPM:', result.kpm);
+  //     console.log('スコア用正確率:', (accuracy * 100).toFixed(2) + '%');
   //     console.log('ミスタイプ数:', result.mistypeCount);
   //     console.log('連続ミスタイプ数:', result.continuousMistypeCount);
   //     console.log('スレッドID:', thread.id);
@@ -174,7 +174,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   //     await AppDataSource.manager.transaction(async transactionalEntityManager => {
   //       const submission = transactionalEntityManager.create(Submission, {
   //         userId: interaction.user.username,
-  //         speed: speed,
+  //         speed: result.kpm,
   //         accuracy: accuracy,
   //         miss: result.mistypeCount,
   //         continuousMiss: result.continuousMistypeCount,
@@ -193,7 +193,9 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   //     .addFields(
   //       { name: 'レベル', value: `${result.level}`, inline: true },
   //       { name: '文字数', value: `${result.charCount}文字`, inline: true },
-  //       { name: '正確率', value: `${result.accuracyRate}%`, inline: true },
+  //       { name: 'KPM', value: `${result.kpm}`, inline: true },
+  //       { name: 'スコア用正確率', value: `${(accuracy * 100).toFixed(2)}%`, inline: true },
+  //       { name: 'スコア', value: `${score}`, inline: true },
   //       { name: 'ミスタイプ数', value: `${result.mistypeCount}回`, inline: true },
   //       { name: '連続ミスタイプ数', value: `${result.continuousMistypeCount}回`, inline: true },
   //       { name: '💬 コメント', value: comment, inline: false }
