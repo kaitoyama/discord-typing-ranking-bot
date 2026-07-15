@@ -55,17 +55,23 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       });
     }
 
-    const embed = new EmbedBuilder()
-      .setColor(0x00FF00)
-      .setTitle('タイピングランキング')
-      .setDescription((showAll ? '全ユーザーのランキング' : 'トップ16のランキング') + ' (このチャンネル)');
+    const sortedScores = rankedScores
+      .sort((a: { best_score: number; }, b: { best_score: number; }) => b.best_score - a.best_score);
 
+    // Discordの制限: 1 embedあたりフィールドは25個まで
+    const FIELDS_PER_EMBED = 25;
+    const embeds: EmbedBuilder[] = [];
 
-    rankedScores
-      .sort((a: { best_score: number; }, b: { best_score: number; }) => b.best_score - a.best_score)
-      .forEach((score: { user_name: any; best_score: any; speed: number; accuracy: number; miss: any; continuous_miss: any; }, index: number) => {
+    for (let i = 0; i < sortedScores.length; i += FIELDS_PER_EMBED) {
+      const chunk = sortedScores.slice(i, i + FIELDS_PER_EMBED);
+      const embed = new EmbedBuilder()
+        .setColor(0x00FF00)
+        .setTitle('タイピングランキング')
+        .setDescription((showAll ? '全ユーザーのランキング' : 'トップ16のランキング') + ' (このチャンネル)');
+
+      chunk.forEach((score: { user_name: any; best_score: any; speed: number; accuracy: number; miss: any; continuous_miss: any; }, indexInChunk: number) => {
         embed.addFields({
-          name: `#${index + 1}`,
+          name: `#${i + indexInChunk + 1}`,
           value: `ユーザー名: ${score.user_name}\n` +
                  `最高スコア: ${score.best_score}\n` +
                  `KPM: ${score.speed.toFixed(2)}\n` +
@@ -76,7 +82,14 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         });
       });
 
-    return interaction.reply({ embeds: [embed] });
+      embeds.push(embed);
+    }
+
+    await interaction.reply({ embeds: [embeds[0]] });
+    for (const embed of embeds.slice(1)) {
+      await interaction.followUp({ embeds: [embed] });
+    }
+    return;
 
   } catch (error) {
     console.error('ランキング取得エラー:', error);
