@@ -115,7 +115,18 @@ function getRandomComment(speed: number, accuracy: number): string {
   return accuracyComments[randomIndex];
 }
 
+// 提出を締め切る場合はtrueにする
+const SUBMIT_CLOSED: boolean = true;
+
 export async function execute(interaction: ChatInputCommandInteraction) {
+  if (SUBMIT_CLOSED) {
+    await interaction.reply({
+      content: '提出は締め切られました。',
+      ephemeral: true
+    });
+    return;
+  }
+
   const image = interaction.options.getAttachment('image', true);
 
   // 元のメッセージを送信
