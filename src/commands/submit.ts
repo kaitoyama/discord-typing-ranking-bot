@@ -116,7 +116,7 @@ function getRandomComment(speed: number, accuracy: number): string {
 }
 
 // 提出を締め切る場合はtrueにする
-const SUBMIT_CLOSED: boolean = true;
+const SUBMIT_CLOSED: boolean = false;
 
 export async function execute(interaction: ChatInputCommandInteraction) {
   if (SUBMIT_CLOSED) {
